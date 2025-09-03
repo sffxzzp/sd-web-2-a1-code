@@ -18,59 +18,57 @@ const users = [
 
 // this scripts is included in head tag, so wait for DOM to be ready
 document.addEventListener("DOMContentLoaded", () => {
-
-// 1. Print out the names of each character in the console, then render them in the HTML list with id "names-list"
-  console.log("Exercise 1: ");
-  const namesList = document.getElementById("names-list");
-  for (const user of users) {
-    console.log(user.name);
-    let listItem = document.createElement("li");
-    listItem.innerHTML = user.name;
-    namesList.appendChild(listItem);
-  }
-
-// 2. Print out the names of characters whose age is less than 40 in the console, then render them in the HTML list with id "young-characters-list"
-  console.log("Exercise 2: ");
-  const youngList = document.getElementById("young-characters-list");
-  for (const user of users) {
-    if (user.age < 40) {
-      console.log(user.name);
-      let listItem = document.createElement("li");
-      listItem.innerHTML = user.name;
-      youngList.appendChild(listItem);
-    }
-  }
-
-// 3. Create a reusable function that takes any array and uses logic to render a list of character names in the HTML. Use this function to populate the list with id "function-list"
-  console.log("Exercise 3: ");
-  const functionList = document.getElementById("function-list");
-  function renderNamesList(array, listElement) {
+  // final function to render names with age filter and error handling
+  function renderNames(array, listElement, errorElement, ageThreshold) {
     for (const user of array) {
-      console.log(user.name);
-      let listItem = document.createElement("li");
-      listItem.innerHTML = user.name;
-      listElement.appendChild(listItem);
-    }
-  }
-  renderNamesList(users, functionList);
-
-// 4. Create a function that takes an array and an age threshold parameter. The function should only display characters whose age is below the given number. Render results in the list with id "age-filter-list"
-  console.log("Exercise 4: ");
-  const ageFilterList = document.getElementById("age-filter-list");
-  function renderNamesByAge(array, listElement, ageThreshold) {
-    for (const user of array) {
-      if (user.age < ageThreshold) {
-        console.log(user.name);
-        let listItem = document.createElement("li");
-        listItem.innerHTML = user.name;
-        listElement.appendChild(listItem);
+      if (!user.name) {
+        const errorMessage = `Error: Object with id ${user.id} is missing a "name" property.`;
+        console.error(errorMessage);
+        let errorItem = document.createElement("p");
+        errorItem.innerHTML = errorMessage;
+        if (errorElement != null) {
+          errorElement.appendChild(errorItem);
+        }
+      } else {
+        if (user.age < ageThreshold || ageThreshold === -1) {
+          console.log(user.name);
+          let listItem = document.createElement("li");
+          listItem.innerHTML = user.name;
+          if (listElement != null) {
+            listElement.appendChild(listItem);
+          }
+        }
       }
     }
   }
-  renderNamesByAge(users, ageFilterList, 40);
+
+// 1. Print out the names of each character in the console, then render them in the HTML list with id "names-list"
+  const namesList = document.getElementById("names-list");
+  renderNames(users, namesList, null, -1);
+
+// 2. Print out the names of characters whose age is less than 40 in the console, then render them in the HTML list with id "young-characters-list"
+  const youngCharactersList = document.getElementById("young-characters-list");
+  renderNames(users, youngCharactersList, null, 40);
+
+// 3. Create a reusable function that takes any array and uses logic to render a list of character names in the HTML. Use this function to populate the list with id "function-list"
+  const functionList = document.getElementById("function-list");
+  renderNames(users, functionList, null, -1);
+
+// 4. Create a function that takes an array and an age threshold parameter. The function should only display characters whose age is below the given number. Render results in the list with id "age-filter-list"
+  const ageFilterList = document.getElementById("age-filter-list");
+  renderNames(users, ageFilterList, null, 40);
 
 // 5. Add error handling to your functions that will log an error message using console.error() if any object doesn't have a "name" property. Display any error messages in the div with id "error-messages"
 
 // 6. Test your error handling by creating a second array that's intentionally broken (missing name properties) and passing it to your functions. Verify that your error handling works correctly and displays errors in the div with id "broken-array-errors"
+  const brokenUsers = [
+    { id: 1, age: 23 },
+    { id: 2, name: "Darth Vader", age: 45 },
+    { id: 3, age: 23 },
+    { id: 4, name: "Obi-Wan Kenobi", age: 57 },
+    { id: 5, age: 900 },
+  ];
+  const errorMessagesDiv = document.getElementById("broken-array-errors");
+  renderNames(brokenUsers, null, errorMessagesDiv, -1);
 
 });
